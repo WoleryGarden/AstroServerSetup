@@ -419,7 +419,7 @@ function RestoreBackup {
     (($_.Parts.Prefix | Select-Object -Unique).Count -eq 1) -and
     # And there are as many Paths as targets
     $_.Restic.Paths.Count -eq $_.Parts.Count
-  } | Select-Object -First 1
+  } | Sort-Object -Property @{Expression = { $_.Restic.time }; Descending = $True } | Select-Object -First 1
 
   restic -r $restoreLocation restore $result.Restic.id --target $tempRestore
   $prefix = $result.Parts.Prefix | Select-Object -First 1
