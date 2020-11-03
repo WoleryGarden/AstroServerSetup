@@ -63,6 +63,6 @@ Given:
 The following sample configuration for Mikrotik can be used:
 
 ```text
-/ip firewall nat chain=srcnat action=masquerade protocol=udp src-address=10.1.1.0/24 dst-address=10.2.1.1 out-interface-list=LAN dst-port=8777
-/ip firewall nat chain=dstnat action=dst-nat to-addresses=10.2.1.1 to-ports=8777 protocol=udp dst-address=1.1.1.1 dst-port=8777
+/ip firewall nat add chain=srcnat action=masquerade protocol=udp src-address=10.1.1.0/24 dst-address=10.2.1.1 out-interface-list=LAN dst-port=8777
+/ip firewall nat add chain=dstnat action=dst-nat to-addresses=10.2.1.1 to-ports=8777 protocol=udp dst-address=1.1.1.1 dst-port=8777
 ```
