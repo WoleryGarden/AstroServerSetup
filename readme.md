@@ -41,6 +41,7 @@ For `restic` authentication the following environment variables have to be suppl
 * AWS_ACCESS_KEY_ID
 * AWS_SECRET_ACCESS_KEY
 * RESTIC_PASSWORD
+* RESTIC_REPOSITORY
 
 See [restic documentation](https://restic.readthedocs.io/en/stable/) for their meaning.
 
