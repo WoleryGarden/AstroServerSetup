@@ -402,7 +402,7 @@ function RestoreBackup {
 
   $tempRestore = "$installPath\restore"
 
-  $data = restic -r $restoreLocation snapshots --last --json | ConvertFrom-Json
+  $data = restic -r $restoreLocation snapshots --latest 1 --json | ConvertFrom-Json
 
   # Adds Prefix/Suffix breakdown (as above) for each path
   $decorated = $data | ForEach-Object {
@@ -425,7 +425,7 @@ function RestoreBackup {
   $prefix = $result.Parts.Prefix | Select-Object -First 1
   Push-Location
   Set-Location $tempRestore
-  $prefix.Replace(":", "").Split([IO.Path]::DirectorySeparatorChar) | ForEach-Object {
+  $prefix.Replace(":", "").Split([IO.Path]::DirectorySeparatorChar) | Where-Object { $_ } | ForEach-Object {
     Set-Location $_
   }
 
@@ -481,6 +481,17 @@ function SetupBackups {
   $data = $data.Replace("%backupLocation%",$backupLocation)
   [IO.File]::WriteAllText("$scheduledTasksFolder\restic-backup.ps1", $data)
    
+  Copy-Item "$PSScriptRoot\restic-restore.ps1" "$scheduledTasksFolder\restic-restore.ps1" -Force
+  
+  $data = [IO.File]::ReadAllText("$scheduledTasksFolder\restic-backup.ps1")
+  $data = $data.Replace("%AWS_ACCESS_KEY_ID%",$env:AWS_ACCESS_KEY_ID)
+  $data = $data.Replace("%AWS_SECRET_ACCESS_KEY%",$env:AWS_SECRET_ACCESS_KEY)
+  $data = $data.Replace("%RESTIC_PASSWORD%",$env:RESTIC_PASSWORD)
+  $data = $data.Replace("%scheduledTasksFolder%",$scheduledTasksFolder)
+  $data = $data.Replace("%installPath%",$installPath)
+  $data = $data.Replace("%backupLocation%",$backupLocation)
+  [IO.File]::WriteAllText("$scheduledTasksFolder\restic-restore.ps1", $data)
+
   $A = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-File $scheduledTasksFolder\restic-backup.ps1"
   $T = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 10)
   $P = New-ScheduledTaskPrincipal ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name) -LogonType S4U

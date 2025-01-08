@@ -206,8 +206,8 @@ function RestoreBackup {
 
   $tempRestore = "$installPath\restore"
 
-  #$data = restic snapshots --last --json | ConvertFrom-Json
-  $data = restic snapshots 3e39afd6 --json | ConvertFrom-Json
+  $data = restic snapshots --latest 1 --json | ConvertFrom-Json
+  #$data = restic snapshots 3e39afd6 --json | ConvertFrom-Json
 
   # Adds Prefix/Suffix breakdown (as above) for each path
   $decorated = $data | ForEach-Object {
@@ -230,7 +230,7 @@ function RestoreBackup {
   $prefix = $result.Parts.Prefix | Select-Object -First 1
   Push-Location
   Set-Location $tempRestore
-  $prefix.Replace(":", "").Split([IO.Path]::DirectorySeparatorChar) | ForEach-Object {
+  $prefix.Replace(":", "").Split([IO.Path]::DirectorySeparatorChar) | Where-Object { $_ } |ForEach-Object {
     Set-Location $_
   }
 
